@@ -1,10 +1,12 @@
-let state = "countdown";
-let timerDisplay = document.getElementById("timer");
-let button = document.getElementById("clickButton");
-let statusMsg = document.getElementById("statusMessage");
+const timerDisplay = document.getElementById("timer");
+const button = document.getElementById("clickButton");
+const statusMsg = document.getElementById("statusMessage");
 
-let clicked = false;
+let state = localStorage.getItem('state') || 'countdown';
+let endTime = Number(localStorage.getItem('endTime')) || Date.now() + 24 * 60 * 60 * 1000;
+let clicked = localStorage.getItem('clicked') === 'true';
 
+// Süre formatlama
 function formatTime(ms) {
   let totalSeconds = Math.floor(ms / 1000);
   let hours = Math.floor(totalSeconds / 3600);
@@ -13,8 +15,8 @@ function formatTime(ms) {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
-function startCountdown(duration, onComplete) {
-  let endTime = Date.now() + duration;
+// Sayacı başlatma
+function startCountdown(onComplete) {
   let interval = setInterval(() => {
     let remaining = endTime - Date.now();
     if (remaining <= 0) {
@@ -27,48 +29,74 @@ function startCountdown(duration, onComplete) {
   }, 1000);
 }
 
+// Alarm döngüsünü başlat
+function startAlarmCycle() {
+  state = "countdown";
+  clicked = false;
+  button.style.display = "none";
+  button.disabled = false;
+  statusMsg.textContent = "24-hour countdown started.";
+  endTime = Date.now() +  60 * 1000;
+  localStorage.setItem('state', state);
+  localStorage.setItem('endTime', endTime);
+  localStorage.setItem('clicked', clicked);
+  startCountdown(startClickWindow);
+}
+
+// 10 dk'lık tıklama süresini başlat
 function startClickWindow() {
   state = "clickWindow";
   clicked = false;
-  button.disabled = false;
   button.style.display = "inline-block";
+  button.disabled = false;
   statusMsg.textContent = "Click the button within 10 minutes or lose!";
-
-  startCountdown(10 * 60 * 1000, () => {
+  endTime = Date.now() + 10 * 1000;
+  localStorage.setItem('state', state);
+  localStorage.setItem('endTime', endTime);
+  localStorage.setItem('clicked', clicked);
+  
+  startCountdown(() => {
     if (!clicked) {
       statusMsg.textContent = "⛔ Game Over! You didn't click in time.";
       button.disabled = true;
     } else {
       statusMsg.textContent = "✅ You survived! Restarting 24-hour timer.";
       button.style.display = "none";
-      setTimeout(() => {
-        statusMsg.textContent = "";
-        startAlarmCycle();
-      }, 2000);
+      setTimeout(startAlarmCycle, 2000);
     }
   });
 }
 
+// Butona tıklanma işlemi
 button.onclick = () => {
   if (state === "clickWindow" && !clicked) {
     clicked = true;
-    button.disabled = true;
+    localStorage.setItem('clicked', clicked);
     statusMsg.textContent = "🟢 You clicked in time!";
     button.style.display = "none";
   }
 };
 
-function startAlarmCycle() {
-  state = "countdown";
-  button.style.display = "none";
-  statusMsg.textContent = "24-hour countdown started.";
-
-  // Gerçek kullanım (24 saat):
-  //startCountdown(24 * 60 * 60 * 1000, startClickWindow);
-
-  // Test için (30 saniye sonra başlar):
-   startCountdown(30 * 1000, startClickWindow);
-}
-
-// Programı başlat:
-startAlarmCycle();
+// Sayfa açılınca önceki durumu yükleme
+window.onload = () => {
+  if (state === "countdown") {
+    statusMsg.textContent = "24-hour countdown continues.";
+    button.style.display = "none";
+    startCountdown(startClickWindow);
+  } else if (state === "clickWindow") {
+    if (clicked) {
+      statusMsg.textContent = "🟢 You clicked! Next alarm soon.";
+      button.style.display = "none";
+      setTimeout(startAlarmCycle, 2000);
+    } else {
+      button.style.display = "inline-block";
+      statusMsg.textContent = "Click the button within remaining time!";
+      startCountdown(() => {
+        if (!clicked) {
+          statusMsg.textContent = "⛔ Game Over! You didn't click in time.";
+          button.disabled = true;
+        }
+      });
+    }
+  }
+};
