@@ -1,17 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Alarm Game</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Çiçek Sulama Günlüğü</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #fdf6f0;
+    }
+
+    img {
+      margin-top: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      background-color: #ff80ab;
+      border: none;
+      color: white;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+
+    button:hover {
+      background-color: #ff4d88;
+    }
+
+    #statusMessage {
+      margin-top: 10px;
+      color: green;
+    }
+  </style>
 </head>
 <body>
-  <h1>Alarm Game</h1>
 
-  <h2>Time Remaining:</h2>
-  <p id="timer">Loading...</p>
-
-  <button id="clickButton" style="display:none;">Click to Survive</button>
+  <h1>Çiçek Sulama Günlüğü 🌸</h1>
+  <p id="streak">Streak: 0 gün</p>
+  <img id="flowerImage" src="" alt="Çiçek" width="300"><br>
+  <button id="waterButton">Bugün Sulama Yap</button>
   <p id="statusMessage"></p>
 
   <script src="script.js"></script>
