@@ -1,9 +1,8 @@
-let state = "countdown"; // "countdown" or "clickWindow"
+let state = "countdown";
 let timerDisplay = document.getElementById("timer");
 let button = document.getElementById("clickButton");
 let statusMsg = document.getElementById("statusMessage");
 
-let clickWindowTriggered = false;
 let clicked = false;
 
 function formatTime(ms) {
@@ -12,15 +11,6 @@ function formatTime(ms) {
   let minutes = Math.floor((totalSeconds % 3600) / 60);
   let seconds = totalSeconds % 60;
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-}
-function startAlarmCycle() {
-  state = "countdown";
-  button.style.display = "none";
-  statusMsg.textContent = "24-hour countdown started.";
-  startCountdown(24 * 60 * 60 * 1000, startClickWindow);
-
-  // TEST AMAÇLI (24 saat beklememek için):
-  // startCountdown(30 * 1000, startClickWindow); // 30 saniye sonra başlasın
 }
 
 function startCountdown(duration, onComplete) {
@@ -40,6 +30,7 @@ function startCountdown(duration, onComplete) {
 function startClickWindow() {
   state = "clickWindow";
   clicked = false;
+  button.disabled = false;
   button.style.display = "inline-block";
   statusMsg.textContent = "Click the button within 10 minutes or lose!";
 
@@ -52,7 +43,7 @@ function startClickWindow() {
       button.style.display = "none";
       setTimeout(() => {
         statusMsg.textContent = "";
-        startAlarmCycle(); // restart 24 hour
+        startAlarmCycle();
       }, 2000);
     }
   });
@@ -61,6 +52,7 @@ function startClickWindow() {
 button.onclick = () => {
   if (state === "clickWindow" && !clicked) {
     clicked = true;
+    button.disabled = true;
     statusMsg.textContent = "🟢 You clicked in time!";
     button.style.display = "none";
   }
@@ -70,8 +62,13 @@ function startAlarmCycle() {
   state = "countdown";
   button.style.display = "none";
   statusMsg.textContent = "24-hour countdown started.";
-  startCountdown(24 * 60 * 60 * 1000, startClickWindow);
+
+  // Gerçek kullanım (24 saat):
+  //startCountdown(24 * 60 * 60 * 1000, startClickWindow);
+
+  // Test için (30 saniye sonra başlar):
+   startCountdown(30 * 1000, startClickWindow);
 }
 
-// Start the whole thing:
+// Programı başlat:
 startAlarmCycle();
