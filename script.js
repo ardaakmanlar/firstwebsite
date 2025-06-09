@@ -13,6 +13,15 @@ function formatTime(ms) {
   let seconds = totalSeconds % 60;
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
+function startAlarmCycle() {
+  state = "countdown";
+  button.style.display = "none";
+  statusMsg.textContent = "24-hour countdown started.";
+  startCountdown(24 * 60 * 60 * 1000, startClickWindow);
+
+  // TEST AMAÇLI (24 saat beklememek için):
+  // startCountdown(30 * 1000, startClickWindow); // 30 saniye sonra başlasın
+}
 
 function startCountdown(duration, onComplete) {
   let endTime = Date.now() + duration;
